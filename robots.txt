@@ -1,0 +1,2 @@
+Disallow: /index.html
+Disallow: /index.php
