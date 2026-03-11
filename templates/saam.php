@@ -33,7 +33,7 @@ textarea#page_editor { width: 100%; height: 700px; }
 
 .card-group > .card { -ms-flex: 0 1 25%; flex: 0 1 25%; }
 
-{page-css}
+{style}
 	</style>
 </head>
 <body>
@@ -58,16 +58,15 @@ textarea#page_editor { width: 100%; height: 700px; }
 	</div>
 <?php endif; ?>
 	<div class="row g-0 py-2 user-select-none">
-		{module-menu-main}
+		<?php if ($user->isAuth()): ?><A href="/menu-top/edit">Правка</A><?php endif; ?>{MenuTop}
 	</div>
 	<div class="row g-0 p-2 content bg-white">
-<?php if ($user->isAuth() && $mode == 'view'): ?>
+<?php if ($user->isAuth() && $controller->mode == 'view'): ?>
 		<div class="col-12 p-0 user-select-none">
-			{admin-breadcrumbs}
+			<A href="<?php echo($controller->path . '' . $controller->page); ?>/edit">Правка</A>
 		</div>
 <?php endif; ?>
 		<div class="col-12">
-			{debug}
 			{content}
 		</div>
 	</div>

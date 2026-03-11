@@ -9,13 +9,13 @@
 	<tr>
 		<td>&nbsp;</td>
 		<td>
-			<input type="text" placeholder="Код с картинки" name="capcha" required form="from_login"><br>
-			<img src="{srp}/capcha">
+			<input type="text" placeholder="Код с картинки" name="captcha" required form="from_login"><br>
+			<img src="/captcha">
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2"><button type="submit" form="from_login">Вход</button></td>
 	</tr>
 </table>
-<form method="post" action="/{srp}/auth" id="from_login"></form>
+<form method="post" action="/auth" id="from_login"></form>
 </pro>

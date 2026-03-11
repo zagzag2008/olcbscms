@@ -3,10 +3,10 @@
 EOL;
 ?>
 <!--script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script-->
-<script src="/{srp}/js/marked.umd.js"></script>
+<script src="/js/marked.umd.js"></script>
 
-<link rel="stylesheet" href="{srp}/css/simplemde.css">
-<script src="{srp}/js/simplemde.min.js"></script>
+<link rel="stylesheet" href="/css/simplemde.css">
+<script src="/js/simplemde.min.js"></script>
 <script>
 
 var customMarkdownParser = function (text) {
@@ -40,7 +40,7 @@ var customMarkdownParser = function (text) {
 		// обрабатываем пути
 		if (img.href.startsWith('/')) img.href = img.href.substr(1);
 		if (img.href.split('/')[0] == 'images') {
-			img.href = '/{srp}/' + img.href;
+			img.href = '/' + img.href;
 		} else {
 			console.log(img.href.split('/'));
 		}

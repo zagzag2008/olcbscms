@@ -16,7 +16,7 @@ class Controller {
 		// Путь к файлу/папке
 
 		// Режимы только для авторизованных пользователей
-		$file_name = 'index.php';
+		$file_name = 'index';
 		$sef_last = array_pop($sef);
 		switch ($sef_last) {
 		case 'folder': 
@@ -24,17 +24,16 @@ class Controller {
 		case 'save': 
 			if ($user->isAuth()) $this->mode = $sef_last;
 			break;
-		case 'login':
+		case 'auth':
 		case 'captcha':
 			$this->mode = $sef_last;
 			break;
-		default:
-			$file_name = ($sef_last == '' ? 'index' : $sef_last). '.php';
 		}
 
-		$path = implode('/', $sef);
-		$pages_path = realpath(dirname(__FILE__) . '/../pages');
-		$file_path = "$pages_path/$path";
+		$this->page = ($sef_last == '' ? 'index' : array_pop($sef));
+		$this->path = implode('/', $sef);
+		//$pages_path = realpath(dirname(__FILE__) . '/../pages');
+		//$file_path = "$pages_path/$path";
 
 		// для рендера использовать $controller->file_path, $controller->file_name и $controller->mode
 /*		echo '<pre>';
