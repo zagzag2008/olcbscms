@@ -9,20 +9,6 @@ spl_autoload_register(function ($class) {
 });
 $plugins = glob(__DIR__ . '/plugins/*.php');
 
-// Рендеринг
-/*
-foreach ($plugins as $plugin) {
-	$pluginName = basename($plugin, '.php');
-	$pluginClass = "Plugin\\$pluginName";
-	if (class_exists($pluginClass)) {
-		$pluginInstance = new $pluginClass();
-		$pluginInstance->onRender();
-	} else {
-		echo $pluginClass . ' не найден' . PHP_EOL;
-	}
-}
-*/
-
 // Класс проверки авторизации пользователя
 require 'classes/user.php';
 $user = new User(); 
@@ -34,7 +20,7 @@ $controller = new Controller($user);
 
 switch ($controller->mode) {
 case 'captcha':
-	require realpath(dirname(__FILE__)) . '/modules/captcha.php';
+	require realpath(__DIR__ . '/modules/captcha.php');
 	exit;
 case 'auth':
 	sleep(2); // защита от быстрого подбора
@@ -53,10 +39,9 @@ case 'save':
 		header('Content-Type: application/json');
 		$input = json_decode(file_get_contents('php://input'), true);
 		$markdown = $input['markdown'];
-		$content_file = $pages_path . '/' . implode('/', $sef) . '.php';
-		if (!file_exists($content_file) && is_dir($pages_path . '/' . implode('/', $sef))) {
-			$content_file = $pages_path . '/' . implode('/', $sef) . '/index.php';
-		}
+		$path = $controller->path;
+		$page = ($controller->page == '' ? 'index' : $controller->page);
+		$content_file = realpath(__DIR__ . '/pages' . $path) . '/' . $page . '.md';
 		file_put_contents($content_file, $markdown);
 		echo json_encode(['status' => 'success']);
 	}

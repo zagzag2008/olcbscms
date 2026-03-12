@@ -37,6 +37,8 @@ class Page {
 			foreach ($this->plugins as $plugin) {
 				$plugin->onInit();
 			}
+			
+			//var_dump($user);
 		} else {
 			echo "$template_file не найден";
 		}
@@ -47,12 +49,20 @@ class Page {
 		$page = $this->controller->page;
 		$mode = $this->controller->mode;
 		//echo "mode: $mode, path: $path, page: $page<br>";
-		$content_file = realpath(__DIR__ . "/../pages") . '/' . ($path == '' ? '' : "$path/") . $page . '.md';
+		$content_file = realpath(__DIR__ . "/../pages") . ($path == '' ? '' : "$path") . $page . '.md';
 		if (file_exists($content_file)) {
 			$this->content = file_get_contents($content_file);
 		} else {
-			$this->content = "404: $content_file";
-			// файла нет, или показываем папку или 404
+			if ($mode =='view') {
+				if ($this->user->isAuth()) {
+					$this->content = "Страница $path$page не существует<BR><A href='$path$page/edit'>Создать</A>";
+				} else {
+					$this->content = "Страница $path$page не найдена";
+					header("HTTP/1.0 404 Not Found");
+				}
+			} else {
+				$this->content = '';
+			}
 		}
 
 /*		case 'folder': // файловый менеджер (только для админов)
@@ -81,7 +91,7 @@ class Page {
 		// парсер Markdown (c) Emanuil Rusev https://github.com/erusev/parsedown/
 		if ($this->controller->mode == 'edit') {
 			$content = '<textarea id="page_editor">' . $content . '</textarea>';
-//			$content .= call_module('simplemde');
+			$content .= file_get_contents(realpath(__DIR__ . '/../modules') . '/simplemde.php');
 		} else {
 			require_once 'ParsedownExtended.php';
 			$Parsedown = new ParsedownExtended();

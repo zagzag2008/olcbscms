@@ -1,16 +1,13 @@
-<?php
-	$page_css[] =<<<EOL
-EOL;
-?>
-<!--script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script-->
 <script src="/js/marked.umd.js"></script>
+<!--link rel="stylesheet" href="/css/simplemde.css"-->
+<!--script src="/js/simplemde.min.js"></script-->
 
-<link rel="stylesheet" href="/css/simplemde.css">
-<script src="/js/simplemde.min.js"></script>
+<link rel="stylesheet" href="/npm/easymde/dist/easymde.min.css">
+<script src="/npm/easymde/dist/easymde.min.js"></script>
+<script src="/js/turndown.js"></script>
 <script>
 
 var customMarkdownParser = function (text) {
-
 	// Рендер карточек ::: card
 /*
 ::: card
@@ -42,9 +39,9 @@ var customMarkdownParser = function (text) {
 		if (img.href.split('/')[0] == 'images') {
 			img.href = '/' + img.href;
 		} else {
-			console.log(img.href.split('/'));
+			//console.log(img.href.split('/'));
 		}
-		console.log(img.href);
+		//console.log(img.href);
 		return '<img src=\"' + img.href + '\" alt=\"' + img.text + '\"' + width + height + (img.title ? ' title="' + img.text + '"' : '') + '>';
 	};
 	return marked.parse(text, { renderer: renderer });
@@ -55,9 +52,14 @@ function page_save(editor) {
 	editor.codemirror.setOption("readOnly", true);
 	var markdown = editor.value();
 
+	// URL для отправки материала
+	const sef = window.location.pathname.split('/');
+	sef.pop(); // удаляем команду edit
+	if (sef[sef.length - 1] == 'index') { sef.pop(); } // удаляем index если есть
+	
 	// AJAX запрос
 	var xhr = new XMLHttpRequest();
-	xhr.open('POST', '<?php echo strtr($request_uri, ['/edit' => '/save']); ?>', true);
+	xhr.open('POST', sef.join('/') + '/save', true); 
 	xhr.responseType = 'json';
 	xhr.setRequestHeader('Content-Type', 'application/json');
 	xhr.onreadystatechange = function() {
@@ -67,8 +69,7 @@ function page_save(editor) {
 	xhr.onload = function() {
 		if (xhr.status === 200) {
 			var data = xhr.response;
-			console.log(data.status);
-			if (data.status == 'success') window.location.href = '<?php echo strtr($request_uri, ['/edit' => '']); ?>';
+			if (data.status == 'success') window.location.href = sef.join('/'); 
 		}
 	}
 
@@ -76,20 +77,42 @@ function page_save(editor) {
 }
 
 $(document).ready(function() {
-var simplemde = new SimpleMDE({
+// Turndown для Word мусора
+var turndownService = new TurndownService({
+  headingStyle: 'atx',
+  bulletListMarker: '-',
+  codeBlockStyle: 'fenced',
+  emDelimiter: '*',
+  strongDelimiter: '**',
+  // Убираем лишние переносы
+  blankReplacement: function(content, node) {
+    return '';
+  },
+  // Правильные абзацы
+  paragraph: {
+    filter: 'p',
+    replacement: function(content) {
+      return '\n\n' + content + '\n\n';
+    }
+  }
+});
+	
+//var simplemde = new SimpleMDE({
+var simplemde = new EasyMDE({
 	element: document.getElementById("page_editor"),
 	forceSync: true,
+	forcePasteAsPlainText: true,
 	renderingConfig: {
-		singleLineBreaks: false,
+		singleLineBreaks: true,
 		codeSyntaxHighlighting: false,
 	},
 	status: false, /* statusbar */
 	//status: ["autosave", "lines", "words", "cursor"], 
 	//autosave: { enabled: true, uniqueId: "olcbsru", delay: 1000 },
 	insertTexts: {
-		//horizontalRule: ["", "\n\n-----\n\n"],
+		horizontalRule: ["", "\n\n-----\n\n"],
 		image: ["![](", " \"=0x150\")"],
-		//link: ["[", "](https://)"],
+		link: ["[", "](https://)"],
 		table: ["", "\n\n| Заголовок 1 | Заголовок 2 | Заголовок 3 |\n| -------- | -------- | -------- |\n| Текст     | Текст      | Текст     |\n\n"],
 	},
 	previewRender: function(plainText) {
@@ -140,8 +163,47 @@ var simplemde = new SimpleMDE({
 	}], // Another optional usage, with a custom status bar item that counts keystrokes
 	tabSize: 4,
 */
-});
+}); // simplemde.config
 
-});
+// Обрабатываем вставку из Word
+// Удаляем комментарии и Word-мусор ПЕРЕД Turndown
+function cleanWordHtml(html) {
+  // Удаляем HTML-комментарии
+  html = html.replace(/<!--[\s\S]*?-->/g, '');
+  html = html.replace(/<!.*?>/g, '');
+  // Удаляем Word-стили и атрибуты
+  //html = html.replace(/<span[^>]*>([^<]*)<\/span>/gi, '$1');
+  html = html.replace(/(&nbsp;|\s+)/gi, ' ');
+  html = html.replace(/style="[^"]*"/gi, '');
+  html = html.replace(/class="[^"]*Mso[^"]*"/gi, '');
+  // br → два переноса только внутри параграфов
+//  html = html.replace(/<br[^>]*>/gi, '\n\n');
+  return html;
+}
+
+// Paste обработчик
+simplemde.codemirror.getWrapperElement().addEventListener('paste', function(event) {
+  var htmlData = event.clipboardData.getData('text/html');
+//  var textData = event.clipboardData.getData('text/plain');
+  
+  if (htmlData) {
+    // Очистка Word мусора
+    var cleanHtml = cleanWordHtml(htmlData);
+    var markdown = turndownService.turndown(cleanHtml);
+    
+    // Финальная очистка Markdown
+    markdown = markdown
+      .replace(/\n{4,}/g, '\n\n')  // убираем лишние переносы
+      .replace(/^\s+|\s+$/g, '')  // убираем пробелы по краям
+		.replace(/\u00B7/g, '\u002a');
+    
+	simplemde.codemirror.replaceSelection(markdown);
+	event.preventDefault();
+	event.stopPropagation(); // Дополнительная защита
+	return false;    
+  }
+}, true); // true - выполнять раньше других обработчиков
+
+}); // dom.reaady
 
 </script>

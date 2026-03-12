@@ -32,6 +32,7 @@ a.button:hover { background-color: #333; color: #fff; text-decoration: none; }
 textarea#page_editor { width: 100%; height: 700px; }
 
 .card-group > .card { -ms-flex: 0 1 25%; flex: 0 1 25%; }
+button.table { width: unset; color: unset; }
 
 {style}
 	</style>
@@ -41,7 +42,7 @@ textarea#page_editor { width: 100%; height: 700px; }
 <?php if ($user->isAuth()): ?>
 	<div class="row g-0 user-select-none">
 		<div class="col-12 border p-0">
-			Пользователь: <?php echo $user->user_login; ?>
+			Пользователь: <?php echo $user->user_login; ?> <A href="/logout">Выход</A>
 		</div>
 	</div>
 <?php endif; ?>
@@ -50,15 +51,15 @@ textarea#page_editor { width: 100%; height: 700px; }
 			<img class="w-100" src="/images/header_default.png" alt="Саамский свет">
 		</div>
 	</div>
-<?php if (false && $cmd == 'home'): ?>
+<?php if ($controller->path == '/' && $controller->page == 'index'): ?>
 	<div class="row g-0 user-select-none">
 		<div class="col-12 border p-0">
-			{module-slider-main}
+			<img class="w-100" src="/images/home.png" alt="Страницы саамской культуры">
 		</div>
 	</div>
 <?php endif; ?>
 	<div class="row g-0 py-2 user-select-none">
-		<?php if ($user->isAuth()): ?><A href="/menu-top/edit">Правка</A><?php endif; ?>{MenuTop}
+		<?php if ($user->isAuth()): ?><A href="/menu-top/edit">Правка меню</A><?php endif; ?>{MenuTop}
 	</div>
 	<div class="row g-0 p-2 content bg-white">
 <?php if ($user->isAuth() && $controller->mode == 'view'): ?>
