@@ -1,6 +1,8 @@
 RewriteEngine on
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_URI} !\.(jpg|jpeg|png|gif|css|js|ico)$ [NC]
 RewriteRule . index.php [L]
 
 php_flag display_startup_errors on

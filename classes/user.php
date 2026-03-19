@@ -29,7 +29,7 @@ class User {
 
 	private function defaultUsers() {
 		return [
-		'admin' => ['password' => 'biblpass']
+		'admin' => ['password' => '1']
 		];
 	}
 }

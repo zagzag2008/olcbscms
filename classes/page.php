@@ -48,8 +48,8 @@ class Page {
 		$path = $this->controller->path;
 		$page = $this->controller->page;
 		$mode = $this->controller->mode;
-		//echo "mode: $mode, path: $path, page: $page<br>";
 		$content_file = realpath(__DIR__ . "/../pages") . ($path == '' ? '' : "$path") . $page . '.md';
+		//echo "mode: '$mode', path: '$path', page: '$page'<br>$content_file";
 		if (file_exists($content_file)) {
 			$this->content = file_get_contents($content_file);
 		} else {
@@ -85,55 +85,19 @@ class Page {
 
 		// обрабатываем $this->template встроенные блоки: {style}
 		$this->template = preg_replace('/\{style\}/', implode(PHP_EOL . PHP_EOL, $this->style), $this->template);
-		$content = $this->content;
 
-		// Обработка контента
-		// парсер Markdown (c) Emanuil Rusev https://github.com/erusev/parsedown/
+		$content = $this->content;
 		if ($this->controller->mode == 'edit') {
 			$content = '<textarea id="page_editor">' . $content . '</textarea>';
-			$content .= file_get_contents(realpath(__DIR__ . '/../modules') . '/simplemde.php');
+			$content .= file_get_contents(realpath(__DIR__ . '/../modules') . '/easymde.php');
 		} else {
-			require_once 'ParsedownExtended.php';
-			$Parsedown = new ParsedownExtended();
-			$Parsedown->setBreaksEnabled(true);
-			$content = $Parsedown->text($content);
+			// 
+			//$content = "<div id='content'>$content</div><script>document.getElementById('content').innerHTML = marked.parse(document.getElementById('content').innerHTML);</script>";
+			$content = "<div id='content'>$content</div><script>mode = 'view'; document.getElementById('content').innerHTML = customMarkdownParser(document.getElementById('content').innerHTML);</script>";
 		}
 
 		// подставляем {content}
 		$this->template = preg_replace('/\{content\}/', $content, $this->template);
-
-
-/*
-$page_html = preg_replace_callback('/\{([\w\d-]+?)\}/siu', function ($matches) {
-	global $sef, $srp, $user, $debug, $request_uri, $pages_path;
-	switch($matches[0]) {
-	case '{debug}': $ret = '<p>' . implode('<br>', $debug) . '</p>'; break;
-	case '{current-file}': 
-		$content_file = $pages_path . '/' . implode('/', $sef) . '.php';
-		if (!file_exists($content_file) && is_dir($pages_path . '/' . implode('/', $sef))) {
-			$ret = 'index.php';
-		} else {
-			$ret = $sef[count($sef) - 1] . '.php';
-		}
-		break;
-	case '{admin-breadcrumbs}': // Ссылки на просмотр папок и редактирование файла
-		/ <A href="<?php echo $request_uri;?>/edit">{current-file}</A> /
-		$folders = array();
-		$html = '';
-		$file = array_pop($sef);
-		foreach ($sef as $folder) {
-			$folders[] = $folder;
-			$html .= ' / <A href="' . $srp . '/' . implode('/', $folders) . '/folder">' . $folder . '</A> ';
-		}
-		$ret = $html . ' / ' . '<A href="' . $request_uri . '/edit">' . $file . '</A>';
-		
-		break;
-	default: $ret = $matches[0]; 
-	}
-	return $ret;
-}, $page_html);
-$page_html = str_replace('{page-css}', implode(PHP_EOL . PHP_EOL, $page->style()), $page_html);
-*/
 
 // Обработка изображений и миниатюр (в кеш)
 /*

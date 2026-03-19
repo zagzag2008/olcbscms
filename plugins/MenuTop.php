@@ -9,12 +9,12 @@ class MenuTop {
     public function onInit() {
         global $page;
         $page->style[] = <<<EOL
-.menu-main { width: 100%; display: flex; justify-content: center; flex-wrap: wrap; flex-direction: row; margin: 0; list-style-type: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; align-items: stretch; z-index: 2; }
+.menu-main { width: 100%; display: flex; justify-content: space-between; flex-wrap: wrap; flex-direction: row; margin: 0; list-style-type: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; align-items: stretch; z-index: 2; }
 .menu-main A:hover { text-decoration: none; }
 .menu-main LI { list-style-type: none; }
 
-.menu-main > LI { display: block; position: relative; margin: 3px; }
-.menu-main > LI > A { display: block; padding: 5px; height: 100%; display: flex; align-items: center; text-align: center; }
+.menu-main > LI { display: block; position: relative; margin: 0; flex-grow: 1; }
+.menu-main > LI > A { display: block; padding: 5px 20px; height: 100%; display: flex; align-items: center; text-align: center; }
 .menu-main > LI > UL.menu-dropdown { display: none; position: absolute; flex-direction: column; list-style-type: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; z-index: 1; }
 .menu-main > LI:hover > UL.menu-dropdown { display: flex; background-color: #fff; width: max-content; min-width: 100%; }
 .menu-main > LI > UL.menu-dropdown > LI {  }

@@ -1,12 +1,10 @@
 # История/Масельги (/maselga)
 
-# Персоналии (#)
-## Агеева
-## Перепелица
-## Карповы
-## Яковлев
-## Виночосу
-## Ксенчее (врач)
+# Персоналии (/persons)
+## Агеева Анфиса Максимовна (/persons/ageeva-anfisa-maksimovna)
+## Королёва Ксения Витальевна (/persons/koroleva-kseniya-vitalyevna)
+## Перепелица Ольга Андреевна (/persons/perepelitca-olga-andreevna)
+## Яковлева Роза Ивановна (/persons/yakovleva-roza-ivanovna)
 
 # Литературное/творчество (#)
 ## Перетоп (#)
